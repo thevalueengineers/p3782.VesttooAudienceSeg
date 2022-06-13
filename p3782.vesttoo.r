@@ -41,16 +41,18 @@ write_csv(clust_stats_2,'clust2.csv')
 
 clustv3 <- c('a1br4','a1br5','a1ar7','a1cr4','a1cr6','a5r7','a5r8','a1br2','a4r7','a4r8','a3r8','a1cr7','a4r3','a1cr5')
 clust3 <- df %>% select(clustv3) %>% mutate(a5r7=2*(a5r7-1)+1,a5r8=2*(a5r8-1)+1,a3r8=2*(a3r8-1)+1,a4r3=a4r3*3,a4r7=a4r7*3,a4r8=a4r8*3)
-clust3 <- clust3 %>% mutate(lookingfor=(a4r8+a3r8),interest=(a1cr4+a1cr6+(10-a5r8))/3,techai=(a1br2+a1br4)/2,a1br5=as.double(a1br5),a1ar7=as.double(a1ar7)) %>% select(-a4r7,-a5r7,-a1cr5,-a4r3,-a1cr7) %>% select(-a1cr4,-a1cr6,-a5r8,-a1br4,-a1br2,-a4r8,-a3r8)
+clust3 <- clust3 %>% mutate(valueprop=(a4r8+a3r8)/1.5,interestednew=(a1cr4+a1cr6+(10-a5r8))/3,techai=(a1br2+a1br4),a1br5=as.double(a1br5),a1ar7=as.double(a1ar7)) %>% select(-a4r7,-a5r7,-a1cr5,-a4r3,-a1cr7) %>% select(-a1cr4,-a1cr6,-a5r8,-a1br4,-a1br2,-a4r8,-a3r8)
 k3<-kmeans(clust3, centers=5, iter.max = 1000, nstart=5)
 k3
 df$cluster3 <- k3$cluster
 clust_stats_3<-df %>% select(cluster3,contains('a1'), contains('a2'),contains('a3'),contains('a4'),contains('a5'),contains('c1r'),contains('c7r'),contains('c8r')) %>% select(-contains('oe'),-a4r96,-noanswera4_r99) %>% group_by(cluster3) %>% summarise(across(everything(),mean))
 write_csv(clust_stats_3,'clust3.csv')
 
+View(df %>% select(cluster3,contains('b1')) %>% group_by(cluster3) %>% summarise(across(everything(),mean)))
+
 library(factoextra)
 library(cluster)
-clustm <- pam(clust3,k=5,metric='euclidean',stand=FALSE)
+clustm <- pam(clust3,k=5,metric='manhattan',stand=FALSE)
 clustm
 fviz_nbclust(clust3,pam,method='wss')
 gap_stat <- clusGap(clust3,FUN=pam,K.max=8,B=50)
